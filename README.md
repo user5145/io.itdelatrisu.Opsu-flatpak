@@ -1,0 +1,1 @@
+# io.itdelatrisu.Opsu-flatpak
