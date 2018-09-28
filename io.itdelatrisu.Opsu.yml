@@ -10,21 +10,13 @@ finish-args:
 - "--device=dri"
 - "--socket=pulseaudio"
 - "--device=all"
-- "--env=JAVA_HOME=/app/extensions/jvm/openjdk-10/"
-- "--env=PATH=/app/bin:/usr/bin:/app/extensions/jvm/openjdk-10/bin"
+- "--env=JAVA_HOME=/usr/lib/sdk/openjdk10/jvm/openjdk-10"
+- "--env=PATH=/usr/lib/sdk/openjdk10/jvm/openjdk-10/bin:/app/bin:/usr/bin"
 
 command: start
 
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.openjdk10
-
-add-extensions:
-  org.freedesktop.Sdk.Extension.openjdk10:
-    version: 1.6
-    directory: extensions
-    subdirectories: true
-    no-auto-download: false
-    autodelete: true
 
 build-options:
   cflags: -O2 -fstack-protector-strong
@@ -51,12 +43,13 @@ modules:
     build-options:
       build-args:
       - "--share=network"
+      - "--env=JAVA_HOME=/usr/lib/sdk/openjdk10/jvm/openjdk-10"
     buildsystem: simple
     build-commands:
     - install -d /app/bin
     - rm -R gradle*
     - cp -R /app/gradle/gradle* .
-    - JAVA_HOME=/usr/lib/sdk/openjdk10/jvm/openjdk-10 gradleUserHomeDir=. /app/gradle/gradlew jar -PXDG=true -PexcludeFFmpeg -PsourceCompatibility=1.10 -PtargetCompatibility=1.10
+    - gradleUserHomeDir=. /app/gradle/gradlew jar -PXDG=true -PexcludeFFmpeg -PsourceCompatibility=1.10 -PtargetCompatibility=1.10
     - install -Dm555 build/libs/opsu-0.16.1.jar /app/bin
 
     sources:
@@ -98,6 +91,3 @@ modules:
 
       - type: file
         path: io.itdelatrisu.Opsu.desktop
-
-    post-install:
-    - mkdir -p /app/extensions
