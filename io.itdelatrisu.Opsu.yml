@@ -74,7 +74,13 @@ modules:
       - type: script
         dest-filename: start
         commands:
-        - 'java -jar -Xms500m -Xmx1G /app/bin/opsu-0.16.1.jar $@'
+        - if [ $(free -m | awk '/^Mem:/{print $2}' ) -gt 3400 ]; then
+        -     echo "start in high memory usage mode"
+        -     'java -Xms500m -Xmx1500m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=5 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:-UseBiasedLocking -XX:-UseCompressedOops -XX:-UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@'
+        - else
+        -     echo "start in low memory usage mode"
+        -     'java -Xms500m -Xmx1G -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:-UseBiasedLocking -XX:+UseCompressedOops -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:-AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@'
+        - fi
 
   - name: resources
     buildsystem: simple
