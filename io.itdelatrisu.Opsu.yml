@@ -23,6 +23,10 @@ build-options:
   cxxflags: -O2 -fstack-protector-strong
   ldflags: -fstack-protector-strong -Wl,-z,relro,-z,now
 
+cleanup:
+  - /gradle
+  - /share
+
 modules:
   - name: xrandr
     sources:
