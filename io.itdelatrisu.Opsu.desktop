@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Opsu
+Comment=Game
+Exec=start %U
+Icon=io.itdelatrisu.Opsu
+StartupNotify=true
+Terminal=false
+Type=Application
+MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;
+Categories=Game;
+Keywords=Real-time;

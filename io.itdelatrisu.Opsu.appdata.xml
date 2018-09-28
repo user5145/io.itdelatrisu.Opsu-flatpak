@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+    <id>io.itdelatrisu.Opsu.desktop</id>
+    <metadata_license>CC-BY-NC-ND-4.0</metadata_license>
+    <project_license>LicenseRef-proprietary</project_license>
+    <name>io.itdelatrisu.Opsu</name>
+    <summary>Game</summary>
+    <description><p>Game</p></description>
+    
+    <project_group>Opsu</project_group>
+    <developer_name>itdelatrisu</developer_name>
+
+    <url type="homepage">https://itdelatrisu.github.io/opsu/</url>
+
+    <categories>
+        <category>Game</category>
+    </categories>
+
+    <recommends>
+        <memory>1024</memory>
+    </recommends>
+
+    <releases>
+        <release date="2018-09-25" version="2018.09.27">
+            <description>
+                <ul>
+                    <li>Opsu.</li>
+                </ul>
+            </description>
+        </release>
+    </releases>
+</component>

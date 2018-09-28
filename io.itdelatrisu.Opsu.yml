@@ -1,0 +1,97 @@
+app-id: io.itdelatrisu.Opsu
+runtime: org.gnome.Platform//3.28
+sdk: org.gnome.Sdk//3.28
+
+finish-args:
+- "--share=ipc"
+- "--share=network"
+- "--socket=x11"
+- "--socket=wayland"
+- "--device=dri"
+- "--socket=pulseaudio"
+- "--device=all"
+- "--env=JAVA_HOME=/app/extensions/jvm/openjdk-10/"
+- "--env=PATH=/app/bin:/usr/bin:/app/extensions/jvm/openjdk-10/bin"
+
+command: start
+
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.openjdk10
+
+add-extensions:
+  org.freedesktop.Sdk.Extension.openjdk10:
+    version: 1.6
+    directory: extensions
+    subdirectories: true
+    no-auto-download: false
+    autodelete: true
+
+build-options:
+  cflags: -O2 -fstack-protector-strong
+  cxxflags: -O2 -fstack-protector-strong
+  ldflags: -fstack-protector-strong -Wl,-z,relro,-z,now
+
+modules:
+  - name: xrandr
+    sources:
+    - type: git
+      url: git://anongit.freedesktop.org/xorg/app/xrandr
+
+  - name: gradle
+    buildsystem: simple
+    build-commands:
+    - install -d /app/gradle
+    - mv * /app/gradle
+    sources:
+    - type: archive
+      url: https://github.com/gradle/gradle/archive/v4.10.2.tar.gz
+      sha256: d8a9a5db98245f311893d9ed891e252c7fe43929fa61633e58b0f5146293b311
+
+  - name: opsu
+    build-options:
+      build-args:
+      - "--share=network"
+    buildsystem: simple
+    build-commands:
+    - install -d /app/bin
+    - rm -R gradle*
+    - cp -R /app/gradle/gradle* .
+    - JAVA_HOME=/usr/lib/sdk/openjdk10/jvm/openjdk-10 gradleUserHomeDir=. /app/gradle/gradlew jar -PXDG=true -PexcludeFFmpeg -PsourceCompatibility=1.10 -PtargetCompatibility=1.10
+    - install -Dm555 build/libs/opsu-0.16.1.jar /app/bin
+
+    sources:
+    - type: archive
+      url: https://github.com/itdelatrisu/opsu/archive/0.16.1.tar.gz
+      sha256: f084ee6adf96f6a705ba85c67265f4557761a07aab5123da486028ab4f67bb37
+
+  - name: start
+    buildsystem: simple
+    build-commands:
+    - install -d /app/bin
+    - install -Dm555 start /app/bin
+
+    sources:
+      - type: script
+        dest-filename: start
+        commands:
+        - 'java -jar -Xms500m -Xmx1G /app/bin/opsu-0.16.1.jar $@'
+
+  - name: resources
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 io.itdelatrisu.Opsu.png /app/share/icons/hicolor/128x128/apps/io.itdelatrisu.Opsu.png
+      - install -Dm644 io.itdelatrisu.Opsu.appdata.xml /app/share/appdata/io.itdelatrisu.Opsu.appdata.xml
+      - install -Dm644 io.itdelatrisu.Opsu.desktop /app/share/applications/io.itdelatrisu.Opsu.desktop
+
+    sources:
+      - type: file
+        path: io.itdelatrisu.Opsu.png
+
+      - type: file
+        path: io.itdelatrisu.Opsu.appdata.xml
+
+      - type: file
+        path: io.itdelatrisu.Opsu.desktop
+
+    post-install:
+    - mkdir -p /app/extensions
