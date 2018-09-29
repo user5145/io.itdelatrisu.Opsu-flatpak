@@ -25,7 +25,6 @@ build-options:
 
 cleanup:
   - /gradle
-  - /share
 
 modules:
   - name: xrandr
