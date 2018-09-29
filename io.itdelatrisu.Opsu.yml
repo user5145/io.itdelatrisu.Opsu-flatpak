@@ -10,17 +10,25 @@ finish-args:
 - "--device=dri"
 - "--socket=pulseaudio"
 - "--device=all"
-- "--env=JAVA_HOME=/usr/lib/sdk/openjdk10/jvm/openjdk-10"
-- "--env=PATH=/usr/lib/sdk/openjdk10/jvm/openjdk-10/bin:/app/bin:/usr/bin"
+- "--env=JAVA_HOME=/app/extensions/jvm/openjdk-10/"
+- "--env=PATH=/app/bin:/usr/bin:/app/extensions/jvm/openjdk-10/bin"
 
 command: start
 
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.openjdk10
 
+add-extensions:
+  org.freedesktop.Sdk.Extension.openjdk10:
+    version: 1.6
+    directory: extensions
+    subdirectories: true
+    no-auto-download: false
+    autodelete: true
+
 build-options:
-  cflags: -O2 -fstack-protector-strong
-  cxxflags: -O2 -fstack-protector-strong
+  cflags: -O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2
+  cxxflags: -O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2
   ldflags: -fstack-protector-strong -Wl,-z,relro,-z,now
 
 cleanup:
@@ -95,3 +103,6 @@ modules:
 
       - type: file
         path: io.itdelatrisu.Opsu.desktop
+
+    post-install:
+    - mkdir -p /app/extensions
