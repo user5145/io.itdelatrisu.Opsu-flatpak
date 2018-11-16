@@ -10,21 +10,10 @@ finish-args:
 - "--device=dri"
 - "--socket=pulseaudio"
 - "--device=all"
-- "--env=JAVA_HOME=/app/extensions/jvm/openjdk-10/"
-- "--env=PATH=/app/bin:/usr/bin:/app/extensions/jvm/openjdk-10/bin"
+- "--env=JAVA_HOME=/app/extensions/jvm/openjdk-8/"
+- "--env=PATH=/app/bin:/usr/bin:/app/extensions/jvm/openjdk-8/bin"
 
 command: start
-
-sdk-extensions:
-  - org.freedesktop.Sdk.Extension.openjdk10
-
-add-extensions:
-  org.freedesktop.Sdk.Extension.openjdk10:
-    version: 1.6
-    directory: extensions
-    subdirectories: true
-    no-auto-download: false
-    autodelete: true
 
 build-options:
   cflags: -O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2
@@ -40,6 +29,17 @@ modules:
     - type: git
       url: git://anongit.freedesktop.org/xorg/app/xrandr
 
+  - name: openjdk_fix_itdelatrisu_opsu_322
+    buildsystem: simple
+    build-commands:
+    - install -d /app/extensions/jvm/
+    - cp -R jdk8u*/jre /app/extensions/jvm/openjdk-8
+    - mv jdk8u* /app/extensions/jvm/openjdk-8-jdk
+    sources:
+    - type: archive
+      url: https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u192-b12/OpenJDK8U-jdk_x64_linux_hotspot_8u192b12.tar.gz
+      sha256: 19c91906c220c8eac38179fb661a810c451779a65b8be530c1d98e15b6bb2673
+
   - name: gradle
     buildsystem: simple
     build-commands:
@@ -54,13 +54,13 @@ modules:
     build-options:
       build-args:
       - "--share=network"
-      - "--env=JAVA_HOME=/usr/lib/sdk/openjdk10/jvm/openjdk-10"
+      - "--env=JAVA_HOME=/app/extensions/jvm/openjdk-8-jdk"
     buildsystem: simple
     build-commands:
     - install -d /app/bin
     - rm -R gradle*
     - cp -R /app/gradle/gradle* .
-    - gradleUserHomeDir=. /app/gradle/gradlew jar -PXDG=true -PexcludeFFmpeg -PsourceCompatibility=1.10 -PtargetCompatibility=1.10
+    - gradleUserHomeDir=. /app/gradle/gradlew jar -PXDG=true -PexcludeFFmpeg -PsourceCompatibility=1.8 -PtargetCompatibility=1.8
     - install -Dm555 build/libs/opsu-0.16.1.jar /app/bin
 
     sources:
@@ -78,14 +78,18 @@ modules:
       - type: script
         dest-filename: start
         commands:
+        - # java 11 startup script is disabled due to #322 @itdelatrisu/opsu
         - # check memory and setup jvm (https://docs.oracle.com/en/java/javase/11/tools/java.html)
-        - if [ $(free -m | awk '/^Mem:/{print $2}' ) -gt 3400 ]; then
-        -     echo "start in high memory usage mode"
-        -     'java -Xms500m -Xmx1500m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=5 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=750m -XX:+UseFMA -XX:-UseBiasedLocking -XX:-UseCompressedOops -XX:-UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch  -jar /app/bin/opsu-0.16.1.jar $@'
-        - else
-        -     echo "start in low memory usage mode"
-        -     'java -Xms250m -Xmx1G -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:+UseFMA -XX:-UseBiasedLocking -XX:+UseCompressedOops -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:-AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@'
-        - fi
+        - # if [ $(free -m | awk '/^Mem:/{print $2}' ) -gt 3400 ]; then
+        - #     echo "start in high memory usage mode"
+        - #     'java -Xms500m -Xmx1500m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=5 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=750m -XX:+UseFMA -XX:-UseBiasedLocking -XX:-UseCompressedOops -XX:-UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch  -jar /app/bin/opsu-0.16.1.jar $@'
+        - # else
+        - #     echo "start in low memory usage mode"
+        - #     'java -Xms250m -Xmx1G -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:+UseFMA -XX:-UseBiasedLocking -XX:+UseCompressedOops -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:-AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@'
+        - # fi
+        -
+        - # temporary java 8 startup script 
+        - java -Xms250m -Xmx1500m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:-UseBiasedLocking -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@
 
   - name: resources
     buildsystem: simple
@@ -103,6 +107,3 @@ modules:
 
       - type: file
         path: io.itdelatrisu.Opsu.desktop
-
-    post-install:
-    - mkdir -p /app/extensions
