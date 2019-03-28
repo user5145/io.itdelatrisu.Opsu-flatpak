@@ -28,6 +28,7 @@ modules:
     sources:
     - type: git
       url: git://anongit.freedesktop.org/xorg/app/xrandr
+      tag: 65fd628cdfd1c95bd01a50706d4577655d1dd404
 
   - name: openjdk_fix_itdelatrisu_opsu_322
     buildsystem: simple
