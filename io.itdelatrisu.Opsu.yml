@@ -47,8 +47,8 @@ modules:
     - mv * /app/gradle
     sources:
     - type: archive
-      url: https://github.com/gradle/gradle/archive/v4.10.2.tar.gz
-      sha256: d8a9a5db98245f311893d9ed891e252c7fe43929fa61633e58b0f5146293b311
+      url: https://services.gradle.org/distributions/gradle-4.10.2-bin.zip
+      sha256: b49c6da1b2cb67a0caf6c7480630b51c70a11ca2016ff2f555eaeda863143a29
 
   - name: opsu
     build-options:
@@ -59,8 +59,8 @@ modules:
     build-commands:
     - install -d /app/bin
     - rm -R gradle*
-    - cp -R /app/gradle/gradle* .
-    - gradleUserHomeDir=. /app/gradle/gradlew jar -PXDG=true -PexcludeFFmpeg -PsourceCompatibility=1.8 -PtargetCompatibility=1.8
+    - cp /app/gradle/bin/gradle .
+    - gradleUserHomeDir=. /app/gradle/bin/gradle jar -PXDG=true -PexcludeFFmpeg -PsourceCompatibility=1.8 -PtargetCompatibility=1.8
     - install -Dm555 build/libs/opsu-0.16.1.jar /app/bin
 
     sources:
@@ -101,9 +101,7 @@ modules:
     sources:
       - type: file
         path: io.itdelatrisu.Opsu.png
-
       - type: file
         path: io.itdelatrisu.Opsu.appdata.xml
-
       - type: file
         path: io.itdelatrisu.Opsu.desktop
