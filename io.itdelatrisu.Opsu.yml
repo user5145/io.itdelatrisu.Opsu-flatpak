@@ -1,6 +1,6 @@
 app-id: io.itdelatrisu.Opsu
-runtime: org.gnome.Platform//3.28
-sdk: org.gnome.Sdk//3.28
+runtime: org.freedesktop.Platform//18.08
+sdk: org.freedesktop.Sdk//18.08
 
 finish-args:
 - "--share=ipc"
@@ -10,10 +10,13 @@ finish-args:
 - "--device=dri"
 - "--socket=pulseaudio"
 - "--device=all"
-- "--env=JAVA_HOME=/app/extensions/jvm/openjdk-8/"
-- "--env=PATH=/app/bin:/usr/bin:/app/extensions/jvm/openjdk-8/bin"
+- "--env=JAVA_HOME=/app/jre"
+- "--env=PATH=/app/bin:/usr/bin:/app/jre/bin"
 
 command: start
+
+sdk-extensions:
+- org.freedesktop.Sdk.Extension.openjdk8
 
 build-options:
   cflags: -O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2
@@ -24,23 +27,18 @@ cleanup:
   - /gradle
 
 modules:
+  - name: openjdk_fix_itdelatrisu_opsu_322
+    buildsystem: simple
+    build-commands:
+    - /usr/lib/sdk/openjdk8/install.sh
+    - /usr/lib/sdk/openjdk8/enable.sh
+    - /usr/lib/sdk/openjdk8/installjdk.sh
+
   - name: xrandr
     sources:
     - type: git
       url: git://anongit.freedesktop.org/xorg/app/xrandr
       tag: xrandr-1.5.0
-
-  - name: openjdk_fix_itdelatrisu_opsu_322
-    buildsystem: simple
-    build-commands:
-    - install -d /app/extensions/jvm/ /app/extensions/jvm/openjdk-8 /app/extensions/jvm/openjdk-8-jdk
-    - cp -R jre/* /app/extensions/jvm/openjdk-8
-    - mv ./* /app/extensions/jvm/openjdk-8-jdk
-    sources:
-      # workaround for ssl errors that occurs with openjdk8 extension
-    - type: archive
-      url: https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u202-b08/OpenJDK8U-jdk_x64_linux_hotspot_8u202b08.tar.gz
-      sha256: f5a1c9836beb3ca933ec3b1d39568ecbb68bd7e7ca6a9989a21ff16a74d910ab
 
   - name: gradle
     buildsystem: simple
@@ -49,14 +47,15 @@ modules:
     - mv * /app/gradle
     sources:
     - type: archive
-      url: https://services.gradle.org/distributions/gradle-5.5.1-bin.zip
-      sha256: 222a03fcf2fcaf3691767ce9549f78ebd4a77e73f9e23a396899fb70b420cd00
+      url: https://services.gradle.org/distributions/gradle-4.10.2-bin.zip
+      sha256: b49c6da1b2cb67a0caf6c7480630b51c70a11ca2016ff2f555eaeda863143a29
 
   - name: opsu
     build-options:
       build-args:
       - "--share=network"
-      - "--env=JAVA_HOME=/app/extensions/jvm/openjdk-8-jdk"
+      - "--env=JAVA_HOME=/usr/lib/sdk/openjdk8/jvm/java-8-openjdk"
+      - "--env=PATH=/app/bin:/usr/bin:/usr/lib/sdk/openjdk8/jvm/java-8-openjdk/bin"
     buildsystem: simple
     build-commands:
     - install -d /app/bin
@@ -64,7 +63,6 @@ modules:
     - cp /app/gradle/bin/gradle .
     - gradleUserHomeDir=. /app/gradle/bin/gradle jar -PXDG=true -PexcludeFFmpeg -PsourceCompatibility=1.8 -PtargetCompatibility=1.8
     - install -Dm555 build/libs/opsu-0.16.1.jar /app/bin
-
     sources:
     - type: archive
       url: https://github.com/itdelatrisu/opsu/archive/0.16.1.tar.gz
@@ -75,12 +73,10 @@ modules:
     build-commands:
     - install -d /app/bin
     - install -Dm555 start /app/bin
-
     sources:
       - type: script
         dest-filename: start
         commands:
-        - # temporary java 8 startup script
         - java -Xms250m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:-UseBiasedLocking -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@
 
   - name: resources
@@ -89,7 +85,6 @@ modules:
       - install -Dm644 io.itdelatrisu.Opsu.png /app/share/icons/hicolor/128x128/apps/io.itdelatrisu.Opsu.png
       - install -Dm644 io.itdelatrisu.Opsu.appdata.xml /app/share/appdata/io.itdelatrisu.Opsu.appdata.xml
       - install -Dm644 io.itdelatrisu.Opsu.desktop /app/share/applications/io.itdelatrisu.Opsu.desktop
-
     sources:
       - type: file
         path: io.itdelatrisu.Opsu.png
