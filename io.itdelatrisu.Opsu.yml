@@ -80,18 +80,8 @@ modules:
       - type: script
         dest-filename: start
         commands:
-        - # java 11 startup script is disabled due to #322 @itdelatrisu/opsu
-        - # check memory and setup jvm (https://docs.oracle.com/en/java/javase/11/tools/java.html)
-        - # if [ $(free -m | awk '/^Mem:/{print $2}' ) -gt 3400 ]; then
-        - #     echo "start in high memory usage mode"
-        - #     'java -Xms500m -Xmx1500m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=5 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=750m -XX:+UseFMA -XX:-UseBiasedLocking -XX:-UseCompressedOops -XX:-UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch  -jar /app/bin/opsu-0.16.1.jar $@'
-        - # else
-        - #     echo "start in low memory usage mode"
-        - #     'java -Xms250m -Xmx1G -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:+UseFMA -XX:-UseBiasedLocking -XX:+UseCompressedOops -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:-AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@'
-        - # fi
-        -
         - # temporary java 8 startup script
-        - java -Xms250m -Xmx1500m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:-UseBiasedLocking -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@
+        - java -Xms250m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:-UseBiasedLocking -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@
 
   - name: resources
     buildsystem: simple
