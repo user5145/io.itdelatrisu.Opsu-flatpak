@@ -28,7 +28,7 @@ modules:
     sources:
     - type: git
       url: git://anongit.freedesktop.org/xorg/app/xrandr
-      tag: 65fd628cdfd1c95bd01a50706d4577655d1dd404
+      tag: xrandr-1.5.0
 
   - name: openjdk_fix_itdelatrisu_opsu_322
     buildsystem: simple
@@ -89,7 +89,7 @@ modules:
         - #     'java -Xms250m -Xmx1G -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:+UseFMA -XX:-UseBiasedLocking -XX:+UseCompressedOops -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:-AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@'
         - # fi
         -
-        - # temporary java 8 startup script 
+        - # temporary java 8 startup script
         - java -Xms250m -Xmx1500m -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=10 -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:ReservedCodeCacheSize=200m -XX:-UseBiasedLocking -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch -jar /app/bin/opsu-0.16.1.jar $@
 
   - name: resources
